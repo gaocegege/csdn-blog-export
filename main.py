@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# coding=utf-8 
 from bs4 import BeautifulSoup
 import urllib2
+import codecs
 import re
 
 class Analyzer(object):
@@ -23,11 +26,18 @@ class Exporter(Analyzer):
 	def __init__(self):
 		super(Exporter, self).__init__()
 
+	# get the title of the article
+	def getTitle(self, detail):
+		return detail.find(class_='article_title').h1.span.a.get_text().split('\r\n')[1]
+
 	def export(self, link, f):
 		html_doc = self.get(link)
-		print html_doc
+		soup = BeautifulSoup(html_doc)
+		detail = self.getContent(soup).find(id='article_details')
+		f.write(u'#' + self.getTitle(soup) + u'\n')
+		article_content = detail.find(class_='article_content')
+		f.write(article_content.text)
 
-		
 	def run(self, link, f):
 		self.export(link, f)
 		
@@ -65,8 +75,10 @@ class Parser(Analyzer):
 
 	def export2markdown(self):
 		for link in self.article_list:
-			f = open(link.split('/')[7] + '.md', 'w')
-			Exporter.run(link, f)
+			exporter = Exporter()
+			f = codecs.open(link.split('/')[7] + '.md', 'w', encoding='utf-8')
+			exporter.run(link, f)
+			f.close()
 
 
 	# run the prog
@@ -74,7 +86,7 @@ class Parser(Analyzer):
 		self.page = -1
 		self.article_list = []
 		self.getAllArticleLink(url)
-		# self.export2markdown()
+		self.export2markdown()
 
 		
 def main():
@@ -86,6 +98,6 @@ def main():
 def debug():
 	url = 'http://blog.csdn.net/shijiebei2009/article/details/7099513'
 	exporter = Exporter()
-	exporter.run(url, open('test.md', 'w'))
+	exporter.run(url, codecs.open('test.md', 'w', encoding='utf-8'))
 
 main()
