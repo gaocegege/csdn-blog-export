@@ -13,6 +13,9 @@ class Analyzer(object):
 		req = urllib2.Request(url, headers=headers)
 		html_doc = urllib2.urlopen(req).read()
 		return html_doc
+
+	def getContent(self, soup):
+		return soup.find(id='container').find(id='body').find(id='main').find(class_='main')
 		
 
 class Exporter(Analyzer):
@@ -20,8 +23,13 @@ class Exporter(Analyzer):
 	def __init__(self):
 		super(Exporter, self).__init__()
 
-	def function():
-		pass
+	def export(self, link, f):
+		html_doc = self.get(link)
+		print html_doc
+
+		
+	def run(self, link, f):
+		self.export(link, f)
 		
 
 class Parser(Analyzer):
@@ -34,7 +42,7 @@ class Parser(Analyzer):
 	# get the articles' link
 	def parse(self, html_doc):
 		soup = BeautifulSoup(html_doc)
-		res = soup.find(id='container').find(id='body').find(id='main').find(class_='main').find(class_='list_item_new').find(id='article_list').find_all(class_='article_item')
+		res = self.getContent(soup).find(class_='list_item_new').find(id='article_list').find_all(class_='article_item')
 		i = 0
 		for ele in res:
 			self.article_list.append('http://blog.csdn.net/' + ele.find(class_='article_title').h1.span.a['href'])
@@ -44,7 +52,7 @@ class Parser(Analyzer):
 	def getPageNum(self, html_doc):
 		soup = BeautifulSoup(html_doc)
 		self.page = 1;
-		res = soup.find(id='container').find(id='body').find(id='main').find(class_='main').find(id='papelist').span
+		res = self.getContent(soup).find(id='papelist').span
 		self.page =  int(str(res).split(' ')[3][3:5])
 
 	# get all the link
@@ -53,7 +61,7 @@ class Parser(Analyzer):
 		# self.parse(self.get(url))
 		for i in range(1, self.page + 1):
 			self.parse(self.get(url + '/article/list/' + str(i)))
-		
+
 
 	def export2markdown(self):
 		for link in self.article_list:
@@ -74,7 +82,10 @@ def main():
 	parser = Parser()
 	parser.run(url)
 
-main()
-# soup = BeautifulSoup(html_doc)
+# main()
+def debug():
+	url = 'http://blog.csdn.net/shijiebei2009/article/details/7099513'
+	exporter = Exporter()
+	exporter.run(url, open('test.md', 'w'))
 
-# print(soup.prettify())
+main()
