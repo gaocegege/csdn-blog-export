@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import urllib2
 import codecs
 import re
+import sys, getopt
 
 class Analyzer(object):
 	"""docstring for Analyzer"""
@@ -63,7 +64,15 @@ class Parser(Analyzer):
 		soup = BeautifulSoup(html_doc)
 		self.page = 1;
 		res = self.getContent(soup).find(id='papelist').span
-		self.page =  int(str(res).split(' ')[3][3:5])
+		# get the page from text
+		buf = str(res).split(' ')[3]
+		strpage = ''
+		for i in buf:
+			if i >= '0' and i <= '9':
+				strpage += i
+		# cast str to int
+		self.page =  int(strpage)
+		return self.page
 
 	# get all the link
 	def getAllArticleLink(self, url):
@@ -80,24 +89,46 @@ class Parser(Analyzer):
 			exporter.run(link, f)
 			f.close()
 
-
-	# run the prog
-	def run(self, url):
+	# the page given
+	def run(self, url, page = -1):
 		self.page = -1
 		self.article_list = []
-		self.getAllArticleLink(url)
+		if page == -1:
+			self.getAllArticleLink(url)
+		else:
+			if page <= self.getPageNum(self.get(url)):
+				self.parse(self.get(url + '/article/list/' + str(page)))
+			else:
+				print 'page overflow:-/'
+				sys.exit(2)
 		self.export2markdown()
+	
 
-		
-def main():
-	url = 'http://blog.csdn.net/shijiebei2009'
+def main(argv):
+	page = -1
+	directory = '-1'
+	try:
+		opts, args = getopt.getopt(argv,"hu:p:o:")
+	except Exception, e:
+		print 'main.py -u <username> [-p <page>] [-o <outputDirectory>]'
+		sys.exit(2)
+
+	for opt, arg in opts:
+		if opt == '-h':
+			print 'main.py -u <username> [-p <page>] [-o <outputDirectory>]'
+			sys.exit()
+		elif opt == '-u':
+			username = arg
+		elif opt == '-p':
+			page = arg
+		elif opt == '-o':
+			directory = arg
+	url = 'http://blog.csdn.net/' + username
 	parser = Parser()
-	parser.run(url)
+	if page != -1:
+		parser.run(url, page)
+	else:
+		parser.run(url)
 
-# main()
-def debug():
-	url = 'http://blog.csdn.net/shijiebei2009/article/details/7099513'
-	exporter = Exporter()
-	exporter.run(url, codecs.open('test.md', 'w', encoding='utf-8'))
-
-main()
+if __name__ == "__main__":
+   main(sys.argv[1:])
