@@ -12,6 +12,7 @@ class Analyzer(object):
 		headers = {'User-Agent': 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36'}
 		req = urllib2.Request(url, headers=headers)
 		html_doc = urllib2.urlopen(req).read()
+		return html_doc
 		
 
 class Exporter(Analyzer):
@@ -29,12 +30,6 @@ class Parser(Analyzer):
 		super(Parser, self).__init__()
 		self.article_list = []
 		self.page = -1
-
-	# get the page of the blog by url
-	def get(self, url):
-		headers = {'User-Agent': 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36'}
-		req = urllib2.Request(url, headers=headers)
-		html_doc = urllib2.urlopen(req).read()
 
 	# get the articles' link
 	def parse(self, html_doc):
@@ -58,6 +53,7 @@ class Parser(Analyzer):
 		# self.parse(self.get(url))
 		for i in range(1, self.page + 1):
 			self.parse(self.get(url + '/article/list/' + str(i)))
+		
 
 	def export2markdown(self):
 		for link in self.article_list:
