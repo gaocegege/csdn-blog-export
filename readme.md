@@ -4,23 +4,29 @@
 
 ## 使用
 
-依赖：
+### 依赖
 	
 	Python 2.7
 		beautifulsoup4
 
-使用方法：
+### 使用方法
 	
 	main.py -u <username> [-f <format>] [-p <page>] [-o <outputDirectory>]
-	<format>： html | markdown
-	<page>为导出特定页面的文章，缺省导出所有文章
-	<outputDirectory>暂不可用
+		<format>： html | markdown，缺省为html
+		<page>为导出特定页面的文章，缺省导出所有文章
+		<outputDirectory>暂不可用
 
-Example：
+### Example
 
 如果想导出[http://blog.csdn.net/cecesjtu](http://blog.csdn.net/cecesjtu)的文章，格式为markdown，命令为：
 
 	./main.py -u cecesjtu -f markdown
+
+格式为html，命令为：
+
+	./main.py -u cecesjtu -f html
+	or
+	./main.py -u cecesjtu
 
 ## To Do
 
