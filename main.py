@@ -62,16 +62,26 @@ class Exporter(Analyzer):
 	def getTitle(self, detail):
 		return detail.find(class_='article_title').h1.span.a.get_text().split('\r\n')[1]
 
-	def export(self, link, f):
+	def export(self, link, filename, form):
+
 		html_doc = self.get(link)
 		soup = BeautifulSoup(html_doc)
 		detail = self.getContent(soup).find(id='article_details')
-		f.write(u'#' + self.getTitle(soup) + u'\n')
-		article_content = detail.find(class_='article_content')
-		f.write(article_content.text)
+		if form == 'markdown':
+			f = codecs.open(filename + '.md', 'w', encoding='utf-8')
+			f.write(u'#' + self.getTitle(soup) + u'\n')
+			article_content = detail.find(class_='article_content')
+			f.write(article_content.text)
+			f.close()
+			return
+		elif form == 'html':
+			f = codecs.open(link.split('/')[7] + '.html', 'w', encoding='utf-8')
+			f.write(detail.prettify())
+			f.close()
+			return
 
-	def run(self, link, f):
-		self.export(link, f)
+	def run(self, link, f, form):
+		self.export(link, f, form)
 		
 
 class Parser(Analyzer):
@@ -114,17 +124,15 @@ class Parser(Analyzer):
 			self.parse(self.get(url + '/article/list/' + str(i)))
 
 
-	def export2markdown(self):
+	def export(self, form):
 		PrintLayer.printArticleCount(len(self.article_list))
 		for link in self.article_list:
 			PrintLayer.printWorkingArticle(link)
 			exporter = Exporter()
-			f = codecs.open(link.split('/')[7] + '.md', 'w', encoding='utf-8')
-			exporter.run(link, f)
-			f.close()
+			exporter.run(link, link.split('/')[7], form)
 
 	# the page given
-	def run(self, url, page = -1):
+	def run(self, url, page=-1, form='markdown'):
 		self.page = -1
 		self.article_list = []
 		PrintLayer.printWorkingPhase('getting-link')
@@ -137,22 +145,24 @@ class Parser(Analyzer):
 				print 'page overflow:-/'
 				sys.exit(2)
 		PrintLayer.printWorkingPhase('export')
-		self.export2markdown()
+		self.export(form)
 		PrintLayer.printOver()
 	
 
 def main(argv):
 	page = -1
 	directory = '-1'
+	username = 'default'
+	form = 'html'
 	try:
-		opts, args = getopt.getopt(argv,"hu:p:o:")
+		opts, args = getopt.getopt(argv,"hu:f:p:o:")
 	except Exception, e:
-		print 'main.py -u <username> [-p <page>] [-o <outputDirectory>]'
+		print 'main.py -u <username> [-f <format>] [-p <page>] [-o <outputDirectory>]'
 		sys.exit(2)
 
 	for opt, arg in opts:
 		if opt == '-h':
-			print 'main.py -u <username> [-p <page>] [-o <outputDirectory>]'
+			print 'main.py -u <username> [-f <format>] [-p <page>] [-o <outputDirectory>]'
 			sys.exit()
 		elif opt == '-u':
 			username = arg
@@ -160,9 +170,18 @@ def main(argv):
 			page = arg
 		elif opt == '-o':
 			directory = arg
+		elif opt == '-f':
+			form = arg
+
+	if username == 'default':
+		print 'Err: Username err'
+		sys.exit(2)
+	if form != 'markdown' and form != 'html':
+		print 'Err: format err'
+		sys.exit(2)
 	url = 'http://blog.csdn.net/' + username
 	parser = Parser()
-	parser.run(url, page)
+	parser.run(url, page, form)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
