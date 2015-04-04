@@ -14,6 +14,12 @@
 	./main.py -u <blogname> [-p <page>]
 	page为导出特定页面的文章，缺省导出所有文章
 
+Example：
+
+如果想导出[http://blog.csdn.net/cecesjtu](http://blog.csdn.net/cecesjtu)的文章，命令为：
+
+	./main.py -u cecesjtu
+
 ## To Do
 
 1. 导出到指定目录
