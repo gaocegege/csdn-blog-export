@@ -125,10 +125,7 @@ def main(argv):
 			directory = arg
 	url = 'http://blog.csdn.net/' + username
 	parser = Parser()
-	if page != -1:
-		parser.run(url, page)
-	else:
-		parser.run(url)
+	parser.run(url, page)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
