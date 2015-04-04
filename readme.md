@@ -23,12 +23,12 @@
 如果想导出[http://blog.csdn.net/cecesjtu](http://blog.csdn.net/cecesjtu)的文章，格式为markdown，命令为：
 
 	./main.py -u cecesjtu -f markdown
+	or
+	./main.py -u cecesjtu
 
 格式为html，命令为：
 
 	./main.py -u cecesjtu -f html
-	or
-	./main.py -u cecesjtu
 
 ## To Do
 
