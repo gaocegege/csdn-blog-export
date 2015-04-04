@@ -6,6 +6,37 @@ import codecs
 import re
 import sys, getopt
 
+# responsible for printing
+class PrintLayer(object):
+	"""docstring for PrintLayer"""
+	def __init__(self, arg):
+		super(PrintLayer, self).__init__()
+		self.arg = arg
+
+	@staticmethod
+	def printWorkingPage(page):
+		print "Work in Page " + str(page)
+
+	@staticmethod
+	def printWorkingArticle(article):
+		print "Work in " + str(article)
+
+	@staticmethod
+	def printWorkingPhase(phase):
+		if phase == 'getting-link':
+			print "Phase 1: Getting the link"
+		elif phase == 'export':
+			print "Phase 2: Exporting"
+
+	@staticmethod
+	def printArticleCount(count):
+		print 'Count of Articles: ' + str(count)
+
+	@staticmethod
+	def printOver():
+		print 'Over. If has any problem, contact me with http://ask.fm/gaocegege'
+		
+
 class Analyzer(object):
 	"""docstring for Analyzer"""
 	def __init__(self):
@@ -79,11 +110,14 @@ class Parser(Analyzer):
 		self.getPageNum(self.get(url))
 		# self.parse(self.get(url))
 		for i in range(1, self.page + 1):
+			PrintLayer.printWorkingPage(i)
 			self.parse(self.get(url + '/article/list/' + str(i)))
 
 
 	def export2markdown(self):
+		PrintLayer.printArticleCount(len(self.article_list))
 		for link in self.article_list:
+			PrintLayer.printWorkingArticle(link)
 			exporter = Exporter()
 			f = codecs.open(link.split('/')[7] + '.md', 'w', encoding='utf-8')
 			exporter.run(link, f)
@@ -93,6 +127,7 @@ class Parser(Analyzer):
 	def run(self, url, page = -1):
 		self.page = -1
 		self.article_list = []
+		PrintLayer.printWorkingPhase('getting-link')
 		if page == -1:
 			self.getAllArticleLink(url)
 		else:
@@ -101,7 +136,9 @@ class Parser(Analyzer):
 			else:
 				print 'page overflow:-/'
 				sys.exit(2)
+		PrintLayer.printWorkingPhase('export')
 		self.export2markdown()
+		PrintLayer.printOver()
 	
 
 def main(argv):
