@@ -5,6 +5,8 @@ import urllib2
 import codecs
 import re
 import sys, getopt
+# https://github.com/aaronsw/html2text
+import html2text
 
 # responsible for printing
 class PrintLayer(object):
@@ -59,10 +61,6 @@ class Exporter(Analyzer):
     def __init__(self):
         super(Exporter, self).__init__()
 
-    # get the title of the article(text)
-    def getTitleText(self, detail):
-        return detail.find(class_='article_title').h1.span.a.get_text().split('\r\n')[1]
-
     # get the title of the article
     def getTitle(self, detail):
         return detail.find(class_='article_title').h1
@@ -71,27 +69,28 @@ class Exporter(Analyzer):
     def getArticleContent(self, detail):
         return detail.find(class_='article_content')
 
+    # export as markdown
     def export2markdown(self, f, detail):
-        pass
+        f.write(html2text.html2text(self.getTitle(detail).prettify()))
+        f.write(html2text.html2text(self.getArticleContent(detail).prettify()))
 
+    # export as html
     def export2html(self, f, detail):
         f.write(self.getTitle(detail).prettify())
         f.write(self.getArticleContent(detail).prettify())
 
+    # export
     def export(self, link, filename, form):
         html_doc = self.get(link)
         soup = BeautifulSoup(html_doc)
         detail = self.getContent(soup).find(id='article_details')
         if form == 'markdown':
             f = codecs.open(filename + '.md', 'w', encoding='utf-8')
-            f.write(u'#' + self.getTitleText(soup) + u'\n')
-            article_content = detail.find(class_='article_content')
-            f.write(article_content.text)
+            self.export2markdown(f, detail)
             f.close()
             return
         elif form == 'html':
             f = codecs.open(filename + '.html', 'w', encoding='utf-8')
-            article_content = detail.find(class_='article_content')
             self.export2html(f, detail)
             f.close()
             return
@@ -169,7 +168,7 @@ def main(argv):
     page = -1
     directory = '-1'
     username = 'default'
-    form = 'html'
+    form = 'markdown'
     try:
         opts, args = getopt.getopt(argv,"hu:f:p:o:")
     except Exception, e:

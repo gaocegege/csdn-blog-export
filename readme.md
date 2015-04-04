@@ -1,6 +1,6 @@
 # CSDN 博客导出工具
 
-一个用python2.7写的博客导出工具，导出为markdown或者html，markdown目前没有实现图片的导出。
+一个用python2.7写的博客导出工具，导出为markdown或者html。
 
 ## 使用
 
@@ -9,10 +9,12 @@
 	Python 2.7
 		beautifulsoup4
 
+此外，在导出markdown格式的时候使用了开源项目[html2text](https://github.com/aaronsw/html2text)
+
 ### 使用方法
 	
 	main.py -u <username> [-f <format>] [-p <page>] [-o <outputDirectory>]
-		<format>： html | markdown，缺省为html
+		<format>： html | markdown，缺省为markdown
 		<page>为导出特定页面的文章，缺省导出所有文章
 		<outputDirectory>暂不可用
 
@@ -31,4 +33,7 @@
 ## To Do
 
 1. 导出到指定目录
-2. markdown格式完善，支持图片
+
+## Licence
+
+GPLv3
