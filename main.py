@@ -36,7 +36,7 @@ class PrintLayer(object):
 
     @staticmethod
     def printOver():
-        print 'Over. If has any problem, contact me with http://ask.fm/gaocegege'
+        print 'Over. If has any problem, contact me with https://github.com/gaocegege/csdn-blog-export/issues'
         
 
 class Analyzer(object):
