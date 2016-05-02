@@ -119,7 +119,13 @@ class Parser(Analyzer):
     def getPageNum(self, html_doc):
         soup = BeautifulSoup(html_doc)
         self.page = 1;
-        res = self.getContent(soup).find(id='papelist').span
+        # papelist if a typo written by csdn front-end programmers?
+        pageList = self.getContent(soup).find(id='papelist')
+        # if there is only a little posts in one blog, the papelist element doesn't even exist
+        if pageList == None:
+        	print "Page is 1"
+        	return 1
+        res = pageList.span
         # get the page from text
         buf = str(res).split(' ')[3]
         strpage = ''
@@ -132,8 +138,9 @@ class Parser(Analyzer):
 
     # get all the link
     def getAllArticleLink(self, url):
+    	# get the num of the page
         self.getPageNum(self.get(url))
-        # self.parse(self.get(url))
+        # iterate all the pages
         for i in range(1, self.page + 1):
             PrintLayer.printWorkingPage(i)
             self.parse(self.get(url + '/article/list/' + str(i)))
