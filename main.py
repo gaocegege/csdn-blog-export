@@ -1,5 +1,6 @@
-#!/usr/bin/python
-# coding=utf-8 
+#!/usr/bin/env python2
+# coding=utf-8
+
 from bs4 import BeautifulSoup
 import urllib2
 import codecs
@@ -36,8 +37,8 @@ class PrintLayer(object):
 
     @staticmethod
     def printOver():
-        print 'Over. If has any problem, contact me with https://github.com/gaocegege/csdn-blog-export/issues'
-        
+        print 'All the posts has been downloaded. If there is any problem, feel free to file issues in https://github.com/gaocegege/csdn-blog-export/issues'
+
 
 class Analyzer(object):
     """docstring for Analyzer"""
@@ -118,7 +119,7 @@ class Parser(Analyzer):
     # may have a bug, because of the encoding
     def getPageNum(self, html_doc):
         soup = BeautifulSoup(html_doc)
-        self.page = 1;
+        self.page = 1
         # papelist if a typo written by csdn front-end programmers?
         pageList = self.getContent(soup).find(id='papelist')
         # if there is only a little posts in one blog, the papelist element doesn't even exist
